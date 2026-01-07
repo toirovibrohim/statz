@@ -1,0 +1,25 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+  color: #e8e8e8;
+}
+
+.main-content {
+  flex: 1;
+  padding: 2rem;
+  padding-top: calc(2rem + 60px); /* Account for fixed header height */
+  max-width: 1400px;
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    padding: 1rem;
+    padding-top: calc(1rem + 60px); /* Account for fixed header height on mobile */
+  }
+}
+

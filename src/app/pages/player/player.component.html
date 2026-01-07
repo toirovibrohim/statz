@@ -1,0 +1,130 @@
+<div class="player-page">
+  @if (isLoading()) {
+    <app-loading-spinner />
+  } @else if (error()) {
+    <app-error-message [title]="'Failed to Load Player'" [message]="error()!" />
+  } @else if (player()) {
+    <div class="player-header">
+      <img [src]="player()!.avatarfull" [alt]="player()!.personaname" class="player-avatar-large" />
+      <div class="player-info">
+        <h1 class="player-name">{{ player()!.personaname }}</h1>
+        @if (player()!.name) {
+          <div class="player-real-name">{{ player()!.name }}</div>
+        }
+        <div class="player-meta">
+          <span class="player-id">ID: {{ player()!.account_id }}</span>
+          @if (player()!.rank_tier) {
+            <span class="player-rank">{{ getRankTier() }}</span>
+          }
+          @if (player()!.loccountrycode) {
+            <span class="player-country">{{ player()!.loccountrycode }}</span>
+          }
+        </div>
+        <a
+          [href]="player()!.profileurl"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="steam-link"
+        >
+          View Steam Profile →
+        </a>
+      </div>
+    </div>
+
+    <div class="stats-grid">
+      <app-stat-card
+        [icon]="'🎮'"
+        [label]="'Total Games'"
+        [value]="getTotalGames()"
+        [subtitle]="'Matches played'"
+      />
+      @if (winLoss()) {
+        <app-stat-card
+          [icon]="'🏆'"
+          [label]="'Wins'"
+          [value]="winLoss()!.win"
+          [subtitle]="getWinRate().toFixed(1) + '% win rate'"
+        />
+        <app-stat-card
+          [icon]="'💔'"
+          [label]="'Losses'"
+          [value]="winLoss()!.lose"
+          [subtitle]="(100 - getWinRate()).toFixed(1) + '% loss rate'"
+        />
+      }
+    </div>
+
+    @if (playerHeroes().length > 0) {
+      <section class="player-heroes-section">
+        <h2 class="section-title">Most Played Heroes</h2>
+        <div class="player-heroes-grid">
+          @for (heroData of playerHeroes(); track heroData.hero_id) {
+            @if (getHeroById(heroData.hero_id); as hero) {
+              <div class="player-hero-card">
+                <app-hero-icon
+                  [heroImage]="hero.img"
+                  [heroName]="hero.localized_name"
+                  [size]="'medium'"
+                />
+                <div class="player-hero-info">
+                  <div class="hero-name">{{ hero.localized_name }}</div>
+                  <div class="hero-stats-row">
+                    <span class="stat">{{ heroData.games }} games</span>
+                    <span class="stat">
+                      {{ ((heroData.win / heroData.games) * 100).toFixed(1) }}% WR
+                    </span>
+                  </div>
+                </div>
+              </div>
+            }
+          }
+        </div>
+      </section>
+    }
+
+    <section class="recent-matches-section">
+      <h2 class="section-title">Recent Matches</h2>
+      @if (matches().length > 0) {
+        <div class="matches-table">
+          <div class="table-header">
+            <div class="col-hero">Hero</div>
+            <div class="col-result">Result</div>
+            <div class="col-kda">K/D/A</div>
+            <div class="col-duration">Duration</div>
+            <div class="col-date">Date</div>
+          </div>
+          @for (match of matches(); track match.match_id) {
+            <a [routerLink]="['/match', match.match_id]" class="table-row">
+              <div class="col-hero">
+                @if (getHeroById(match.hero_id); as hero) {
+                  <div class="hero-cell">
+                    <app-hero-icon
+                      [heroImage]="hero.img"
+                      [heroName]="hero.localized_name"
+                      [size]="'small'"
+                    />
+                    <span class="hero-name-text">{{ hero.localized_name }}</span>
+                  </div>
+                }
+              </div>
+              <div class="col-result">
+                <span class="result-badge" [class.won]="getMatchResult(match) === 'won'" [class.lost]="getMatchResult(match) === 'lost'">
+                  {{ getMatchResult(match) === 'won' ? 'Won' : 'Lost' }}
+                </span>
+              </div>
+              <div class="col-kda">
+                <span class="kda-text">{{ match.kills }}/{{ match.deaths }}/{{ match.assists }}</span>
+                <span class="kda-ratio">{{ getKDA(match) }}</span>
+              </div>
+              <div class="col-duration">{{ formatDuration(match.duration) }}</div>
+              <div class="col-date">{{ formatDate(match.start_time) }}</div>
+            </a>
+          }
+        </div>
+      } @else {
+        <div class="no-matches">No recent matches found</div>
+      }
+    </section>
+  }
+</div>
+

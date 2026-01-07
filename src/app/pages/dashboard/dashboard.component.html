@@ -1,0 +1,115 @@
+<div class="dashboard">
+  <div class="dashboard-header">
+    <h1 class="dashboard-title">Dota 2 Statistics Dashboard</h1>
+    <p class="dashboard-subtitle">Real-time statistics powered by OpenDota API</p>
+  </div>
+
+  @if (isLoading()) {
+    <app-loading-spinner />
+  } @else if (error()) {
+    <app-error-message [title]="'Failed to Load Data'" [message]="error()!" />
+  } @else {
+    <div class="stats-grid">
+      <app-stat-card
+        [icon]="'🎮'"
+        [label]="'Total Heroes'"
+        [value]="totalHeroes()"
+        [subtitle]="'Available in game'"
+        [clickable]="true"
+        (click)="$event.preventDefault()"
+        [routerLink]="['/heroes']"
+      />
+      <app-stat-card
+        [icon]="'⚔️'"
+        [label]="'Pro Matches'"
+        [value]="proMatches().length"
+        [subtitle]="'Recent professional games'"
+        [clickable]="true"
+        (click)="$event.preventDefault()"
+        [routerLink]="['/pro-matches']"
+      />
+      <app-stat-card
+        [icon]="'🏆'"
+        [label]="'Hero Stats'"
+        [value]="heroStats().length"
+        [subtitle]="'With detailed analytics'"
+      />
+    </div>
+
+    <div class="content-grid">
+      <section class="popular-heroes">
+        <div class="section-header">
+          <h2 class="section-title">Popular Heroes</h2>
+          <a routerLink="/heroes" class="view-all-link">View All →</a>
+        </div>
+        <div class="heroes-grid">
+          @for (hero of topHeroes(); track hero.id) {
+            <a [routerLink]="['/hero', hero.id]" class="hero-card">
+              <app-hero-icon [heroImage]="hero.img" [heroName]="hero.localized_name" [size]="'large'" />
+              <div class="hero-info">
+                <div class="hero-name">{{ hero.localized_name }}</div>
+                <div class="hero-stats-mini">
+                  <span class="stat-badge">{{ hero.primary_attr }}</span>
+                  @if (hero.pro_pick > 0) {
+                    <span class="stat-value">
+                      {{ ((hero.pro_win / hero.pro_pick) * 100).toFixed(1) }}% WR
+                    </span>
+                  }
+                </div>
+              </div>
+            </a>
+          }
+        </div>
+      </section>
+
+      <section class="recent-matches">
+        <div class="section-header">
+          <h2 class="section-title">Recent Pro Matches</h2>
+          <a routerLink="/pro-matches" class="view-all-link">View All →</a>
+        </div>
+        <div class="matches-list">
+          @for (match of recentProMatches(); track match.match_id) {
+            <a [routerLink]="['/match', match.match_id]" class="match-card">
+              <div class="match-teams">
+                <div class="team" [class.winner]="match.radiant_win">
+                  <span class="team-name">{{ match.radiant_name || 'Radiant' }}</span>
+                  <span class="team-score">{{ match.radiant_score }}</span>
+                </div>
+                <div class="match-vs">VS</div>
+                <div class="team" [class.winner]="!match.radiant_win">
+                  <span class="team-name">{{ match.dire_name || 'Dire' }}</span>
+                  <span class="team-score">{{ match.dire_score }}</span>
+                </div>
+              </div>
+              <div class="match-info">
+                <span class="match-duration">{{ formatDuration(match.duration) }}</span>
+                <span class="match-time">{{ formatDate(match.start_time) }}</span>
+              </div>
+            </a>
+          }
+        </div>
+      </section>
+    </div>
+
+    <section class="quick-links">
+      <h2 class="section-title">Quick Links</h2>
+      <div class="links-grid">
+        <a routerLink="/heroes" class="link-card">
+          <div class="link-icon">🛡️</div>
+          <div class="link-content">
+            <div class="link-title">Browse Heroes</div>
+            <div class="link-description">View all heroes with detailed statistics</div>
+          </div>
+        </a>
+        <a routerLink="/pro-matches" class="link-card">
+          <div class="link-icon">🎯</div>
+          <div class="link-content">
+            <div class="link-title">Pro Matches</div>
+            <div class="link-description">Watch professional Dota 2 matches</div>
+          </div>
+        </a>
+      </div>
+    </section>
+  }
+</div>
+

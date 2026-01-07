@@ -1,0 +1,83 @@
+<nav class="navbar">
+  <div class="nav-container">
+    <div class="nav-brand">
+      <a routerLink="/" class="brand-link" (click)="closeMobileMenu()">
+        <span class="brand-icon">⚔️</span>
+        <span class="brand-text">statz</span>
+      </a>
+    </div>
+
+    <button class="mobile-menu-toggle" (click)="toggleMobileMenu()" aria-label="Toggle menu">
+      <span class="hamburger-icon">☰</span>
+    </button>
+
+    <div class="nav-content" [class.mobile-open]="mobileMenuOpen()">
+      <div class="nav-links">
+        <a
+          routerLink="/"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          class="nav-link"
+          (click)="closeMobileMenu()"
+        >
+          Dashboard
+        </a>
+        <a
+          routerLink="/heroes"
+          routerLinkActive="active"
+          class="nav-link"
+          (click)="closeMobileMenu()"
+        >
+          Heroes
+        </a>
+        <a
+          routerLink="/pro-matches"
+          routerLinkActive="active"
+          class="nav-link"
+          (click)="closeMobileMenu()"
+        >
+          Pro Matches
+        </a>
+      </div>
+
+      <div class="search-container">
+        <div class="search-input-wrapper">
+          <input
+            type="text"
+            class="search-input"
+            placeholder="Search players..."
+            [value]="searchQuery()"
+            (input)="onSearchInput($event)"
+            (focus)="showResults.set(true)"
+          />
+          @if (isSearching()) {
+            <span class="search-spinner">⏳</span>
+          }
+        </div>
+
+        @if (showResults() && (searchResults().length > 0 || searchQuery().length >= 2)) {
+          <div class="search-results" (click)="$event.stopPropagation()">
+            @if (searchResults().length > 0) {
+              @for (player of searchResults(); track player.account_id) {
+                <div class="search-result-item" (click)="selectPlayer(player)">
+                  <img [src]="player.avatarfull" [alt]="player.personaname" class="player-avatar" />
+                  <div class="player-info">
+                    <div class="player-name">{{ player.personaname }}</div>
+                    <div class="player-id">ID: {{ player.account_id }}</div>
+                  </div>
+                </div>
+              }
+            } @else {
+              <div class="no-results">No players found</div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</nav>
+
+@if (showResults()) {
+  <div class="search-overlay" (click)="clearSearch()"></div>
+}
+

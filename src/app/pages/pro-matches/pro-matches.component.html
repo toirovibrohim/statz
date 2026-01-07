@@ -1,0 +1,72 @@
+<div class="pro-matches-page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Professional Matches</h1>
+      <p class="page-subtitle">Recent professional Dota 2 matches from tournaments and leagues</p>
+    </div>
+    <button class="refresh-btn" (click)="refresh()" [disabled]="isLoading()">
+      🔄 Refresh
+    </button>
+  </div>
+
+  @if (isLoading()) {
+    <app-loading-spinner />
+  } @else if (error()) {
+    <app-error-message [title]="'Failed to Load Matches'" [message]="error()!" />
+  } @else {
+    <div class="matches-count">
+      Showing {{ proMatches().length }} recent professional matches
+    </div>
+
+    <div class="matches-grid">
+      @for (match of proMatches(); track match.match_id) {
+        <a [routerLink]="['/match', match.match_id]" class="match-card">
+          <div class="match-header-row">
+            @if (match.league_name) {
+              <div class="league-name">{{ match.league_name }}</div>
+            } @else {
+              <div class="league-name">League ID: {{ match.leagueid }}</div>
+            }
+            <div class="match-time">{{ formatDate(match.start_time) }}</div>
+          </div>
+
+          <div class="match-teams">
+            <div class="team radiant" [class.winner]="match.radiant_win">
+              <div class="team-side-badge radiant-badge">Radiant</div>
+              <div class="team-name">{{ match.radiant_name || 'Team Radiant' }}</div>
+              <div class="team-score">{{ match.radiant_score }}</div>
+            </div>
+
+            <div class="vs-divider">VS</div>
+
+            <div class="team dire" [class.winner]="!match.radiant_win">
+              <div class="team-side-badge dire-badge">Dire</div>
+              <div class="team-name">{{ match.dire_name || 'Team Dire' }}</div>
+              <div class="team-score">{{ match.dire_score }}</div>
+            </div>
+          </div>
+
+          <div class="match-footer">
+            <div class="match-duration">
+              <span class="footer-icon">⏱️</span>
+              {{ formatDuration(match.duration) }}
+            </div>
+            <div class="match-id">
+              <span class="footer-icon">🎮</span>
+              Match {{ match.match_id }}
+            </div>
+          </div>
+        </a>
+      }
+    </div>
+
+    @if (proMatches().length === 0) {
+      <div class="no-matches">
+        <div class="no-matches-icon">🎯</div>
+        <h3>No pro matches found</h3>
+        <p>Check back later for new professional matches</p>
+      </div>
+    }
+  }
+</div>
+

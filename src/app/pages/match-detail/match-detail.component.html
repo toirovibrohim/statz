@@ -1,0 +1,180 @@
+<div class="match-detail-page">
+  @if (isLoading()) {
+    <app-loading-spinner />
+  } @else if (error()) {
+    <app-error-message [title]="'Failed to Load Match'" [message]="error()!" />
+  } @else if (match()) {
+    <div class="match-header">
+      <div class="match-result">
+        <div class="winner-badge" [class.radiant]="match()!.radiant_win" [class.dire]="!match()!.radiant_win">
+          {{ match()!.radiant_win ? 'Radiant Victory' : 'Dire Victory' }}
+        </div>
+      </div>
+      <div class="match-info-grid">
+        <div class="info-item">
+          <span class="info-label">Match ID</span>
+          <span class="info-value">{{ match()!.match_id }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Duration</span>
+          <span class="info-value">{{ formatDuration(match()!.duration) }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Game Mode</span>
+          <span class="info-value">{{ getGameMode(match()!.game_mode) }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Lobby Type</span>
+          <span class="info-value">{{ getLobbyType(match()!.lobby_type) }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Date</span>
+          <span class="info-value">{{ formatDate(match()!.start_time) }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="teams-container">
+      <!-- Radiant Team -->
+      <section class="team-section radiant">
+        <div class="team-header">
+          <h2 class="team-title">
+            <span class="team-icon">🌟</span>
+            Radiant
+            <span class="team-score">{{ match()!.radiant_score }}</span>
+          </h2>
+        </div>
+        <div class="players-table">
+          <div class="table-header">
+            <div class="col-hero">Hero</div>
+            <div class="col-player">Player</div>
+            <div class="col-kda">K/D/A</div>
+            <div class="col-items">Items</div>
+            <div class="col-stats">Stats</div>
+          </div>
+          @for (player of radiantPlayers(); track player.player_slot) {
+            <div class="table-row">
+              <div class="col-hero">
+                @if (getHeroById(player.hero_id); as hero) {
+                  <div class="hero-cell">
+                    <app-hero-icon
+                      [heroImage]="hero.img"
+                      [heroName]="hero.localized_name"
+                      [size]="'small'"
+                    />
+                    <span class="hero-name">{{ hero.localized_name }}</span>
+                  </div>
+                }
+              </div>
+              <div class="col-player">
+                @if (player.account_id) {
+                  <a [routerLink]="['/player', player.account_id]" class="player-link">
+                    {{ player.personaname || 'Anonymous' }}
+                  </a>
+                } @else {
+                  <span class="player-name">Anonymous</span>
+                }
+              </div>
+              <div class="col-kda">
+                <span class="kda-text">{{ player.kills }}/{{ player.deaths }}/{{ player.assists }}</span>
+                <span class="kda-ratio">{{ getKDA(player) }}</span>
+              </div>
+              <div class="col-items">
+                <div class="items-grid">
+                  @for (itemSlot of [0, 1, 2, 3, 4, 5]; track itemSlot) {
+                    <div class="item-slot">
+                      @if (getPlayerItem(player, itemSlot)) {
+                        <div class="item-icon" [title]="'Item ' + getPlayerItem(player, itemSlot)">
+                          {{ getPlayerItem(player, itemSlot) }}
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
+              </div>
+              <div class="col-stats">
+                <div class="stats-mini">
+                  <span class="stat">{{ player.level }} lvl</span>
+                  <span class="stat">{{ player.last_hits }}/{{ player.denies }} CS</span>
+                  <span class="stat">{{ player.gold_per_min }} GPM</span>
+                  <span class="stat">{{ player.xp_per_min }} XPM</span>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      </section>
+
+      <!-- Dire Team -->
+      <section class="team-section dire">
+        <div class="team-header">
+          <h2 class="team-title">
+            <span class="team-icon">🔥</span>
+            Dire
+            <span class="team-score">{{ match()!.dire_score }}</span>
+          </h2>
+        </div>
+        <div class="players-table">
+          <div class="table-header">
+            <div class="col-hero">Hero</div>
+            <div class="col-player">Player</div>
+            <div class="col-kda">K/D/A</div>
+            <div class="col-items">Items</div>
+            <div class="col-stats">Stats</div>
+          </div>
+          @for (player of direPlayers(); track player.player_slot) {
+            <div class="table-row">
+              <div class="col-hero">
+                @if (getHeroById(player.hero_id); as hero) {
+                  <div class="hero-cell">
+                    <app-hero-icon
+                      [heroImage]="hero.img"
+                      [heroName]="hero.localized_name"
+                      [size]="'small'"
+                    />
+                    <span class="hero-name">{{ hero.localized_name }}</span>
+                  </div>
+                }
+              </div>
+              <div class="col-player">
+                @if (player.account_id) {
+                  <a [routerLink]="['/player', player.account_id]" class="player-link">
+                    {{ player.personaname || 'Anonymous' }}
+                  </a>
+                } @else {
+                  <span class="player-name">Anonymous</span>
+                }
+              </div>
+              <div class="col-kda">
+                <span class="kda-text">{{ player.kills }}/{{ player.deaths }}/{{ player.assists }}</span>
+                <span class="kda-ratio">{{ getKDA(player) }}</span>
+              </div>
+              <div class="col-items">
+                <div class="items-grid">
+                  @for (itemSlot of [0, 1, 2, 3, 4, 5]; track itemSlot) {
+                    <div class="item-slot">
+                      @if (getPlayerItem(player, itemSlot)) {
+                        <div class="item-icon" [title]="'Item ' + getPlayerItem(player, itemSlot)">
+                          {{ getPlayerItem(player, itemSlot) }}
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
+              </div>
+              <div class="col-stats">
+                <div class="stats-mini">
+                  <span class="stat">{{ player.level }} lvl</span>
+                  <span class="stat">{{ player.last_hits }}/{{ player.denies }} CS</span>
+                  <span class="stat">{{ player.gold_per_min }} GPM</span>
+                  <span class="stat">{{ player.xp_per_min }} XPM</span>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      </section>
+    </div>
+  }
+</div>
+

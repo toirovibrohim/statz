@@ -1,0 +1,132 @@
+<div class="heroes-page">
+  <div class="page-header">
+    <h1 class="page-title">Dota 2 Heroes</h1>
+    <p class="page-subtitle">Browse all {{ heroes().length }} heroes with detailed statistics</p>
+  </div>
+
+  @if (isLoading()) {
+    <app-loading-spinner />
+  } @else if (error()) {
+    <app-error-message [title]="'Failed to Load Heroes'" [message]="error()!" />
+  } @else {
+    <div class="filters-bar">
+      <div class="search-box">
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Search heroes..."
+          [value]="searchQuery()"
+          (input)="onSearchInput($event)"
+        />
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-label">Attribute:</label>
+        <div class="filter-buttons">
+          <button
+            class="filter-btn"
+            [class.active]="filterAttribute() === 'all'"
+            (click)="setFilterAttribute('all')"
+          >
+            All
+          </button>
+          <button
+            class="filter-btn"
+            [class.active]="filterAttribute() === 'str'"
+            (click)="setFilterAttribute('str')"
+          >
+            💪 Strength
+          </button>
+          <button
+            class="filter-btn"
+            [class.active]="filterAttribute() === 'agi'"
+            (click)="setFilterAttribute('agi')"
+          >
+            ⚡ Agility
+          </button>
+          <button
+            class="filter-btn"
+            [class.active]="filterAttribute() === 'int'"
+            (click)="setFilterAttribute('int')"
+          >
+            🧠 Intelligence
+          </button>
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-label">Sort by:</label>
+        <div class="filter-buttons">
+          <button
+            class="filter-btn"
+            [class.active]="sortField() === 'name'"
+            (click)="setSortField('name')"
+          >
+            Name
+          </button>
+          <button
+            class="filter-btn"
+            [class.active]="sortField() === 'winrate'"
+            (click)="setSortField('winrate')"
+          >
+            Win Rate
+          </button>
+          <button
+            class="filter-btn"
+            [class.active]="sortField() === 'pickrate'"
+            (click)="setSortField('pickrate')"
+          >
+            Pick Rate
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="heroes-count">
+      Showing {{ filteredAndSortedHeroes().length }} of {{ heroes().length }} heroes
+    </div>
+
+    <div class="heroes-grid">
+      @for (hero of filteredAndSortedHeroes(); track hero.id) {
+        <a [routerLink]="['/hero', hero.id]" class="hero-card">
+          <app-hero-icon
+            [heroImage]="hero.icon"
+            [heroName]="hero.localized_name"
+            [size]="'large'"
+          />
+          <div class="hero-details">
+            <div class="hero-name">{{ hero.localized_name }}</div>
+            <div class="hero-attribute">
+              <span class="attr-icon">{{ getAttributeIcon(hero.primary_attr) }}</span>
+              <span class="attr-name">{{ getAttributeName(hero.primary_attr) }}</span>
+            </div>
+            <div class="hero-stats">
+              <div class="stat-item">
+                <span class="stat-label">Win Rate:</span>
+                <span class="stat-value">{{ getWinRate(hero.id) }}</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Picks:</span>
+                <span class="stat-value">{{ getPickCount(hero.id) }}</span>
+              </div>
+            </div>
+            <div class="hero-roles">
+              @for (role of hero.roles.slice(0, 2); track role) {
+                <span class="role-badge">{{ role }}</span>
+              }
+            </div>
+          </div>
+        </a>
+      }
+    </div>
+
+    @if (filteredAndSortedHeroes().length === 0) {
+      <div class="no-results">
+        <div class="no-results-icon">🔍</div>
+        <h3>No heroes found</h3>
+        <p>Try adjusting your search or filters</p>
+      </div>
+    }
+  }
+</div>
+

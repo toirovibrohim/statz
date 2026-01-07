@@ -1,0 +1,150 @@
+<div class="hero-detail-page">
+  @if (isLoading()) {
+    <app-loading-spinner />
+  } @else if (error()) {
+    <app-error-message [title]="'Failed to Load Hero'" [message]="error()!" />
+  } @else if (hero()) {
+    <div class="hero-header">
+      <div class="hero-portrait">
+        <img
+          [src]="'https://cdn.cloudflare.steamstatic.com' + hero()!.img"
+          [alt]="hero()!.localized_name"
+          class="hero-image-large"
+        />
+      </div>
+      <div class="hero-info">
+        <h1 class="hero-name">{{ hero()!.localized_name }}</h1>
+        <div class="hero-meta">
+          <span class="hero-attribute">
+            {{ getAttributeIcon(hero()!.primary_attr) }}
+            {{ getAttributeName(hero()!.primary_attr) }}
+          </span>
+          <span class="hero-attack-type">{{ getAttackType(hero()!.attack_type) }}</span>
+        </div>
+        <div class="hero-roles">
+          @for (role of hero()!.roles; track role) {
+            <span class="role-badge">{{ role }}</span>
+          }
+        </div>
+      </div>
+    </div>
+
+    @if (heroStats()) {
+      <div class="stats-grid">
+        <app-stat-card
+          [icon]="'🏆'"
+          [label]="'Pro Win Rate'"
+          [value]="getProWinRate()"
+          [subtitle]="heroStats()!.pro_pick + ' picks'"
+        />
+        <app-stat-card
+          [icon]="'🎯'"
+          [label]="'Pro Picks'"
+          [value]="heroStats()!.pro_pick"
+          [subtitle]="heroStats()!.pro_ban + ' bans'"
+        />
+        <app-stat-card
+          [icon]="'⚡'"
+          [label]="'Turbo Win Rate'"
+          [value]="
+            heroStats()!.turbo_picks > 0
+              ? ((heroStats()!.turbo_wins / heroStats()!.turbo_picks) * 100).toFixed(1) + '%'
+              : 'N/A'
+          "
+          [subtitle]="heroStats()!.turbo_picks + ' picks'"
+        />
+      </div>
+
+      <section class="bracket-stats-section">
+        <h2 class="section-title">Win Rate by Rank Bracket</h2>
+        <div class="bracket-grid">
+          @for (bracket of ['1', '2', '3', '4', '5', '6', '7', '8']; track bracket) {
+            <div class="bracket-card">
+              <div class="bracket-name">{{ getBracketName(bracket) }}</div>
+              <div class="bracket-winrate">{{ getBracketWinRate(bracket) }}</div>
+              <div class="bracket-picks">
+                {{ getBracketPicks(bracket) }} picks
+              </div>
+            </div>
+          }
+        </div>
+      </section>
+    }
+
+    <section class="hero-stats-section">
+      <h2 class="section-title">Base Statistics</h2>
+      <div class="base-stats-grid">
+        <div class="stat-group">
+          <h3 class="stat-group-title">Attributes</h3>
+          <div class="stat-item">
+            <span class="stat-label">💪 Strength:</span>
+            <span class="stat-value">{{ hero()!.base_str }} (+{{ hero()!.str_gain }})</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">⚡ Agility:</span>
+            <span class="stat-value">{{ hero()!.base_agi }} (+{{ hero()!.agi_gain }})</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">🧠 Intelligence:</span>
+            <span class="stat-value">{{ hero()!.base_int }} (+{{ hero()!.int_gain }})</span>
+          </div>
+        </div>
+
+        <div class="stat-group">
+          <h3 class="stat-group-title">Combat</h3>
+          <div class="stat-item">
+            <span class="stat-label">⚔️ Attack Damage:</span>
+            <span class="stat-value">{{ hero()!.base_attack_min }}-{{ hero()!.base_attack_max }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">🛡️ Armor:</span>
+            <span class="stat-value">{{ hero()!.base_armor }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">📏 Attack Range:</span>
+            <span class="stat-value">{{ hero()!.attack_range }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">⏱️ Attack Rate:</span>
+            <span class="stat-value">{{ hero()!.attack_rate }}</span>
+          </div>
+        </div>
+
+        <div class="stat-group">
+          <h3 class="stat-group-title">Mobility</h3>
+          <div class="stat-item">
+            <span class="stat-label">👟 Move Speed:</span>
+            <span class="stat-value">{{ hero()!.move_speed }}</span>
+          </div>
+          @if (hero()!.projectile_speed) {
+            <div class="stat-item">
+              <span class="stat-label">🎯 Projectile Speed:</span>
+              <span class="stat-value">{{ hero()!.projectile_speed }}</span>
+            </div>
+          }
+        </div>
+
+        <div class="stat-group">
+          <h3 class="stat-group-title">Survivability</h3>
+          <div class="stat-item">
+            <span class="stat-label">❤️ Base Health:</span>
+            <span class="stat-value">{{ hero()!.base_health }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">💙 Base Mana:</span>
+            <span class="stat-value">{{ hero()!.base_mana }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">🛡️ Magic Resistance:</span>
+            <span class="stat-value">{{ hero()!.base_mr }}%</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="back-link-container">
+      <a routerLink="/heroes" class="back-link">← Back to Heroes</a>
+    </div>
+  }
+</div>
+
