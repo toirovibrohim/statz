@@ -5,7 +5,6 @@ import { OpenDotaService } from '../../services/opendota.service';
 import { Hero, HeroStats } from '../../models/dota.models';
 import { LoadingSpinnerComponent } from '../../components/shared/loading-spinner/loading-spinner.component';
 import { ErrorMessageComponent } from '../../components/shared/error-message/error-message.component';
-import { HeroIconComponent } from '../../components/shared/hero-icon/hero-icon.component';
 import { StatCardComponent } from '../../components/shared/stat-card/stat-card.component';
 
 @Component({
@@ -15,7 +14,6 @@ import { StatCardComponent } from '../../components/shared/stat-card/stat-card.c
     RouterModule,
     LoadingSpinnerComponent,
     ErrorMessageComponent,
-    HeroIconComponent,
     StatCardComponent,
   ],
   templateUrl: './hero-detail.component.html',

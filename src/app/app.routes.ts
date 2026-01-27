@@ -38,6 +38,12 @@ export const routes: Routes = [
     title: 'Pro Matches - statz',
   },
   {
+    path: 'search',
+    loadComponent: () =>
+      import('./pages/search/search.component').then((m) => m.SearchComponent),
+    title: 'Search Players - statz',
+  },
+  {
     path: '**',
     redirectTo: '',
   },

@@ -5,7 +5,12 @@
     <app-error-message [title]="'Failed to Load Player'" [message]="error()!" />
   } @else if (player()) {
     <div class="player-header">
-      <img [src]="player()!.avatarfull" [alt]="player()!.personaname" class="player-avatar-large" />
+      <img 
+        [src]="getPlayerAvatar()" 
+        [alt]="player()!.personaname" 
+        class="player-avatar-large"
+        (error)="onAvatarError($event)"
+      />
       <div class="player-info">
         <h1 class="player-name">{{ player()!.personaname }}</h1>
         @if (player()!.name) {
@@ -54,34 +59,6 @@
       }
     </div>
 
-    @if (playerHeroes().length > 0) {
-      <section class="player-heroes-section">
-        <h2 class="section-title">Most Played Heroes</h2>
-        <div class="player-heroes-grid">
-          @for (heroData of playerHeroes(); track heroData.hero_id) {
-            @if (getHeroById(heroData.hero_id); as hero) {
-              <div class="player-hero-card">
-                <app-hero-icon
-                  [heroImage]="hero.img"
-                  [heroName]="hero.localized_name"
-                  [size]="'medium'"
-                />
-                <div class="player-hero-info">
-                  <div class="hero-name">{{ hero.localized_name }}</div>
-                  <div class="hero-stats-row">
-                    <span class="stat">{{ heroData.games }} games</span>
-                    <span class="stat">
-                      {{ ((heroData.win / heroData.games) * 100).toFixed(1) }}% WR
-                    </span>
-                  </div>
-                </div>
-              </div>
-            }
-          }
-        </div>
-      </section>
-    }
-
     <section class="recent-matches-section">
       <h2 class="section-title">Recent Matches</h2>
       @if (matches().length > 0) {
@@ -125,6 +102,34 @@
         <div class="no-matches">No recent matches found</div>
       }
     </section>
+
+    @if (playerHeroes().length > 0) {
+      <section class="player-heroes-section">
+        <h2 class="section-title">Most Played Heroes</h2>
+        <div class="player-heroes-grid">
+          @for (heroData of playerHeroes(); track heroData.hero_id) {
+            @if (getHeroById(heroData.hero_id); as hero) {
+              <div class="player-hero-card">
+                <app-hero-icon
+                  [heroImage]="hero.icon"
+                  [heroName]="hero.localized_name"
+                  [size]="'medium'"
+                />
+                <div class="player-hero-info">
+                  <div class="hero-name">{{ hero.localized_name }}</div>
+                  <div class="hero-stats-row">
+                    <span class="stat">{{ heroData.games }} games</span>
+                    <span class="stat">
+                      {{ ((heroData.win / heroData.games) * 100).toFixed(1) }}% WR
+                    </span>
+                  </div>
+                </div>
+              </div>
+            }
+          }
+        </div>
+      </section>
+    }
   }
 </div>
 

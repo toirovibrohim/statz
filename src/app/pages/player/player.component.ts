@@ -56,6 +56,15 @@ export class PlayerComponent implements OnInit {
     this.openDotaService.getPlayer(accountId).subscribe({
       next: (player) => {
         this.player.set(player);
+        // Debug: log avatar URL to help troubleshoot
+        console.log('Player avatar URLs:', {
+          avatarfull: player.avatarfull,
+          profileAvatarfull: player.profile?.avatarfull,
+          avatarmedium: player.avatarmedium,
+          profileAvatarmedium: player.profile?.avatarmedium,
+          avatar: player.avatar,
+          profileAvatar: player.profile?.avatar,
+        });
       },
       error: (err) => {
         this.error.set(err.message || 'Failed to load player data');
@@ -131,6 +140,46 @@ export class PlayerComponent implements OnInit {
     const medal = Math.floor(rank / 10);
     const medals = ['', 'Herald', 'Guardian', 'Crusader', 'Archon', 'Legend', 'Ancient', 'Divine', 'Immortal'];
     return `${medals[medal]} ${tier}`;
+  }
+
+  getPlayerAvatar(): string {
+    const player = this.player();
+    if (!player) return '';
+    
+    // Try avatarfull first, then profile.avatarfull, then avatarmedium, then avatar
+    let avatarUrl = player.avatarfull || 
+                    player.profile?.avatarfull || 
+                    player.avatarmedium || 
+                    player.profile?.avatarmedium ||
+                    player.avatar || 
+                    player.profile?.avatar ||
+                    '';
+    
+    // If we have an avatar URL
+    if (avatarUrl) {
+      // If it's already a full URL (starts with http:// or https://), return as is
+      if (avatarUrl.startsWith('http://') || avatarUrl.startsWith('https://')) {
+        return avatarUrl;
+      }
+      // Otherwise, it's likely a Steam CDN path, prepend the base URL if needed
+      // Steam avatars are usually already full URLs, but just in case
+      if (avatarUrl.startsWith('//')) {
+        return 'https:' + avatarUrl;
+      }
+      if (avatarUrl.startsWith('/')) {
+        return 'https://steamcdn-a.akamaihd.net' + avatarUrl;
+      }
+      return avatarUrl;
+    }
+    
+    // Default Steam avatar fallback
+    return 'https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/fe/fef49e7fa7e1997310d705b2a6158ff8dc1cdfeb_full.jpg';
+  }
+
+  onAvatarError(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    // Fallback to default Steam avatar
+    img.src = 'https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/fe/fef49e7fa7e1997310d705b2a6158ff8dc1cdfeb_full.jpg';
   }
 }
 

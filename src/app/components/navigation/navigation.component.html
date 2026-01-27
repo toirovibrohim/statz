@@ -40,7 +40,7 @@
         </a>
       </div>
 
-      <div class="search-container">
+      <form class="search-container" (submit)="onSearchSubmit($event)">
         <div class="search-input-wrapper">
           <input
             type="text"
@@ -48,36 +48,14 @@
             placeholder="Search players..."
             [value]="searchQuery()"
             (input)="onSearchInput($event)"
-            (focus)="showResults.set(true)"
           />
-          @if (isSearching()) {
-            <span class="search-spinner">⏳</span>
-          }
+          <button type="submit" class="search-button" [disabled]="searchQuery().trim().length < 2">
+            🔍
+          </button>
         </div>
-
-        @if (showResults() && (searchResults().length > 0 || searchQuery().length >= 2)) {
-          <div class="search-results" (click)="$event.stopPropagation()">
-            @if (searchResults().length > 0) {
-              @for (player of searchResults(); track player.account_id) {
-                <div class="search-result-item" (click)="selectPlayer(player)">
-                  <img [src]="player.avatarfull" [alt]="player.personaname" class="player-avatar" />
-                  <div class="player-info">
-                    <div class="player-name">{{ player.personaname }}</div>
-                    <div class="player-id">ID: {{ player.account_id }}</div>
-                  </div>
-                </div>
-              }
-            } @else {
-              <div class="no-results">No players found</div>
-            }
-          </div>
-        }
-      </div>
+      </form>
     </div>
   </div>
 </nav>
 
-@if (showResults()) {
-  <div class="search-overlay" (click)="clearSearch()"></div>
-}
 

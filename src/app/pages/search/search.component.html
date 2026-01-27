@@ -1,0 +1,76 @@
+<div class="search-page">
+  <div class="page-header">
+    <h1 class="page-title">Search Players</h1>
+    <p class="page-subtitle">Find Dota 2 players by username</p>
+  </div>
+
+  <div class="search-section">
+    <form class="search-form" (submit)="onSearchSubmit($event)">
+      <div class="search-input-wrapper">
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Enter player username..."
+          [value]="searchQuery()"
+          (input)="onSearchInput($event)"
+          autofocus
+        />
+        <button type="submit" class="search-button" [disabled]="searchQuery().trim().length < 2">
+          🔍 Search
+        </button>
+      </div>
+    </form>
+  </div>
+
+  @if (isLoading()) {
+    <app-loading-spinner />
+  } @else if (error()) {
+    <app-error-message [title]="'Search Error'" [message]="error()!" />
+  } @else if (hasSearched()) {
+    <div class="results-section">
+      <div class="results-header">
+        <h2 class="results-title">
+          @if (searchResults().length > 0) {
+            Found {{ searchResults().length }} player(s)
+          } @else {
+            No players found
+          }
+        </h2>
+        @if (searchQuery()) {
+          <p class="search-term">Searching for: "{{ searchQuery() }}"</p>
+        }
+      </div>
+
+      @if (searchResults().length > 0) {
+        <div class="players-grid">
+          @for (player of searchResults(); track player.account_id) {
+            <div class="player-card" (click)="selectPlayer(player)">
+              <img [src]="player.avatarfull" [alt]="player.personaname" class="player-avatar" />
+              <div class="player-info">
+                <div class="player-name">{{ player.personaname }}</div>
+                <div class="player-id">ID: {{ player.account_id }}</div>
+                @if (player.last_match_time) {
+                  <div class="player-last-match">
+                    Last match: {{ formatDate(player.last_match_time) }}
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="no-results">
+          <div class="no-results-icon">🔍</div>
+          <h3>No players found</h3>
+          <p>Try searching with a different username</p>
+        </div>
+      }
+    </div>
+  } @else {
+    <div class="empty-state">
+      <div class="empty-state-icon">👤</div>
+      <h3>Search for Players</h3>
+      <p>Enter a player username above and click Search to find Dota 2 players</p>
+    </div>
+  }
+</div>
